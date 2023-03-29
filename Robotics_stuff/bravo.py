@@ -25,6 +25,19 @@ board.set_pin_mode_servo(motor)
 #board.servo_write(motor, forward)
 time.sleep(2)
 
+start_time = time.time()
+end_time = start_time + 5
+
+board.servo_write(motor, forward)
+time.sleep(4)
+board.servo_write(motor, stop)
+
+while start_time <= end_time:
+  print("Forward")
+  forward()
+#start making a '3 point turn'
+board.servo_write(servo, left)
+
 
 
 #function to move forward for a amount of time
