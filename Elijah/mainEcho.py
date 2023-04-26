@@ -47,7 +47,10 @@ while True:
     
     #Video windows
     #cv2.imshow('BandW', img_inv)
-    #show just lines
+    
+    # A video window that only shows the green lines. Then add a single "arrow" line in the middle pointing forward.
+    # Find if the "arrow" intersects a green line for a couple seconds then figure how to change course.
+    # Could use angles and math. or map cords ==> if when x1 is smaller than x2 y1 will be higher than y2 straying right.
     #cv2,imshow('just lines', )
     
     cv2.imshow('OG Video', frame)
