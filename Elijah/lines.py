@@ -14,11 +14,11 @@ while (True):
  
     #Takes the OG image and flips on the Y-axis to make it easier to see
     img_inv = cv2.flip(blackAndWhiteFrame, 1)   
-
-    dst_img = cv2.Canny(capture, 50, 200, None, 3)
-
-    lines = cv2.HoughLines(dst_img, 1, np.pi / 180, 150, None, 0, 0)
     
+    '''
+    # try to make this work live
+    dst_img = cv2.Canny(capture, 50, 200, None, 3)
+    lines = cv2.HoughLines(dst_img, 1, np.pi / 180, 150, None, 0, 0)
     for i in range(0, (lines)):
         rho_l = lines[i][0][0]
         theta_l = lines[i][0][1]
@@ -31,6 +31,9 @@ while (True):
         cv2.line(capture, pt1_l, pt2_l, (0,0,255), 3, cv2.LINE_AA)
 
     cv2.imshow('Lines', capture)
+    # ^
+    '''
+    
     cv2.imshow('video bw', img_inv)
     cv2.imshow('video original', frame)
     
