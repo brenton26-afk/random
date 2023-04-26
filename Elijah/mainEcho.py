@@ -38,6 +38,17 @@ while True:
     #invert B&W because i want to
     img_inv = cv2.flip(blackAndWhiteFrame, 1)
     
+    # Vertical direction line: "arrow"
+    '''
+    height, width, _ = frame.shape
+    black_frame = np.zeros((height, width, 3), dtype=npuint8)
+    
+    middle = int(width/2)
+    
+    
+    cv2.line(black_frame, )
+    '''
+    
     averageLevel = average_light(frame)
     printLevel = str(averageLevel)
     print("Average Light Level is: " + printLevel)
