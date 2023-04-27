@@ -6,7 +6,7 @@ print("Hello World!")
 #find average light level
 # when the average light level is found "map" it into another window that will find and detect lines
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 #finds average light level
 def average_light(frame):
@@ -19,12 +19,16 @@ def process_frame(frame):
     _, thresholded_frame = cv2.threshold(blurred_frame, 200, 255, cv2.THRESH_BINARY)
     lines = cv2.HoughLinesP(thresholded_frame, 1, np.pi / 180, 100, minLineLength=50, maxLineGap=10)
 
+
     if lines is not None:
         for line in lines:
             x1, y1, x2, y2 = line[0]
             cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+            if (x2 <= 320) & (y1 > y2) & (x1 > 320) & (x2 < x1):
+                print("Left")
+
             if (x2 >= 320) & (y1 > y2) & (x1 < 320) & (x2 > x1):
-                print("Right")
+                print("Right")  
     
     return frame
 
@@ -72,3 +76,4 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
+
