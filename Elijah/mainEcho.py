@@ -1,79 +1,94 @@
 import cv2
 import numpy as np
 import math
+import time
 print("Hello World!")
 
-#find average light level
-# when the average light level is found "map" it into another window that will find and detect lines
+cap = cv2.VideoCapture(0)
 
-cap = cv2.VideoCapture(1)
+# The line(s) for the other lines to pass over
+crossL = 280
+crossR = 360
 
-#finds average light level
-def average_light(frame):
-    return np.mean(frame)
+# Sets the resolution of the camera cap
+cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
+# Define the two windows - not needed.
+cv2.namedWindow("Left Camera", cv2.WINDOW_NORMAL)
+cv2.namedWindow("Right Camera", cv2.WINDOW_NORMAL)
 
-def process_frame(frame):
+def process_frame(thisFrame, gray_frame, wSide):
     blurred_frame = cv2.GaussianBlur(gray_frame, (5,5), 0)
-
     _, thresholded_frame = cv2.threshold(blurred_frame, 200, 255, cv2.THRESH_BINARY)
     lines = cv2.HoughLinesP(thresholded_frame, 1, np.pi / 180, 100, minLineLength=50, maxLineGap=10)
 
-
     if lines is not None:
-        for line in lines:
-            x1, y1, x2, y2 = line[0]
-            cv2.line(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-            if (x2 <= 320) & (y1 > y2) & (x1 > 320) & (x2 < x1):
-                print("Left")
-
-            if (x2 >= 320) & (y1 > y2) & (x1 < 320) & (x2 > x1):
-                print("Right")  
+        if (wSide == "Left"):
+            for line in lines:
+                x1, y1, x2, y2 = line[0]
+                cv2.line(thisFrame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                if(x1 < crossL) & (crossL < x2) & (y1 > 150) & (y2 > 150):
+                    print("Right")
+        
+        if (wSide == "Right"):
+            for line2 in lines:
+                x3, y3, x4, y4 = line2[0]
+                cv2.line(thisFrame, (x3, y3), (x4, y4), (255, 0, 0), 2)
+                if(x3 < crossR - (width_cutoff - 10)) & (crossR - (width_cutoff - 10) < x4) & (y3 > 150) & (y4 > 150):
+                    print("Left")
     
-    return frame
-
+    return thisFrame
 
 while True:
+    # Capture a frame from the camera
     ret, frame = cap.read()
+    
+    # Makes sure it is working and will close if it does not load
+    if not ret:
+        break
+
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    
-    #This creates the frame that should find the lines
-    # maybe if light level is higher then change threshold
-    thresh, blackAndWhiteFrame = cv2.threshold(gray_frame, 150, 200, cv2.THRESH_TOZERO)
-    
-    #invert B&W because i want to
-    img_inv = cv2.flip(blackAndWhiteFrame, 1)
-
-    # Vertical direction line: "arrow"
-    #>
-    height, width, _ = frame.shape
+    # Split the frame in half
+    height, width = frame.shape[:2]
+    width_cutoff = width // 2
     black_frame = np.zeros((height, width, 3), dtype=np.uint8)
-    middle = int(width/2)    
-    cv2.line(black_frame, (320, 480), (middle, 180), (255, 0, 0), 5)
-    # ^
+    left_frame = frame[:, :10+width_cutoff]
+    right_frame = frame[:, width_cutoff-10:]
     
-    averageLevel = average_light(frame)
-    printLevel = str(averageLevel)
-    #print("Average Light Level is: " + printLevel)    
+    #Each direction "arrow"
+    cv2.line(left_frame, (crossL, 480), (crossL, 180), (0, 0, 255), 5)
+    # Adjust for the different frame
+    cv2.line(right_frame, (crossR - (width_cutoff - 10), 480), (crossR  - (width_cutoff - 10), 180), (0, 0, 255), 5)
+    
+    # Calls the process_frame function twice to create the lines
+    processed_right_frame = process_frame(right_frame, gray_frame[:, width_cutoff-10:], "Right")
+    processed_left_frame = process_frame(left_frame, gray_frame[:, :10+width_cutoff], "Left")
+    
+    
+    # Show each half in its corresponding window
+    cv2.imshow("Left Camera", processed_left_frame)
+    cv2.imshow("Right Camera", processed_right_frame)
 
-    #finding white line function
-    processed_frame = process_frame(black_frame)
-    
-    #Video windows
-    #cv2.imshow('BandW', img_inv)
-    
-    # A video window that only shows the green lines. Then add a single "arrow" line in the middle pointing forward.
-    # Find if the "arrow" intersects a green line for a couple seconds then figure how to change course.
-    # Could use angles and math. or map cords ==> if when x1 is smaller than x2 y1 will be higher than y2 straying right.
-    cv2.imshow('just lines', black_frame)
-    
-    #cv2.imshow('OG Video', frame)
-    cv2.imshow('other Window', frame)
-    
-    
+    # Exit on Q key press
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
 
+# Release the camera and destroy the windows
 cap.release()
 cv2.destroyAllWindows()
 
+'''
+#finds average light level
+def average_light(frame):
+    return np.mean(frame)
+    
+# This creates the frame that should find the lines
+# maybe if light level is higher then change threshold
+thresh, blackAndWhiteFrame = cv2.threshold(gray_frame, 150, 200, cv2.THRESH_TOZERO)
+    
+#invert B&W because i want to
+img_inv = cv2.flip(blackAndWhiteFrame, 1)
+
+
+'''
