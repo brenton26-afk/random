@@ -55,11 +55,11 @@ while True:
         break
 
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    BandW_frame = cv2.threshold(gray_frame, 150, 200, cv2.THRESH_BINARY)
+    #BandW_frame = cv2.threshold(gray_frame, 150, 200, cv2.THRESH_BINARY)
     # Split the frame in half
     height, width = frame.shape[:2]
     width_cutoff = width // 2
-    black_frame = np.zeros((height, width, 3), dtype=np.uint8)
+    #black_frame = np.zeros((height, width, 3), dtype=np.uint8)
     right_frame = frame[:, width_cutoff-10:]
     left_frame = frame[:, :10+width_cutoff]
     
@@ -68,9 +68,20 @@ while True:
     # Adjust for the different frame
     cv2.line(right_frame, (crossR - (width_cutoff - 10), 480), (crossR  - (width_cutoff - 10), 180), (0, 0, 255), 5)
     
+
+    # Apply the mask
+    right_mask = process_frame(right_frame, gray_frame[:, width_cutoff-10:], "Right")
+    left_mask = process_frame(left_frame, gray_frame[:, :10+width_cutoff], "Left")
+    # Processes the frames again and applies the mask
+    processed_right_frame = cv2.cvtColor(right_mask, cv2.THRESH_TOZERO)
+    processed_left_frame = cv2.cvtColor(left_mask, cv2.THRESH_TOZERO_INV)
+
+    #processed_right_frame = cv2.bitwise_and(right_frame, right_mask)
+    #processed_left_frame = cv2.bitwise_and(left_frame, left_mask)
+
     # Calls the process_frame function twice to create the lines
-    processed_right_frame = process_frame(right_frame, gray_frame[:, width_cutoff-10:], "Right")
-    processed_left_frame = process_frame(left_frame, gray_frame[:, :10+width_cutoff], "Left")
+    #processed_right_frame = process_frame(right_frame, gray_frame[:, width_cutoff-10:], "Right")
+    #processed_left_frame = process_frame(left_frame, gray_frame[:, :10+width_cutoff], "Left")
     
     # Show each half in its corresponding window
     cv2.imshow("Left Camera", processed_left_frame)
