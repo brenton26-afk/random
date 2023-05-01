@@ -4,7 +4,7 @@ import math
 import time
 print("Hello World!")
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(2)
 
 # The line(s) for the other lines to pass over
 crossL = 280
@@ -18,10 +18,16 @@ cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 cv2.namedWindow("Left Camera", cv2.WINDOW_NORMAL)
 cv2.namedWindow("Right Camera", cv2.WINDOW_NORMAL)
 
+
+'''
+
+'''
+
 def process_frame(thisFrame, gray_frame, wSide):
     blurred_frame = cv2.GaussianBlur(gray_frame, (5,5), 0)
     _, thresholded_frame = cv2.threshold(blurred_frame, 200, 255, cv2.THRESH_BINARY)
     lines = cv2.HoughLinesP(thresholded_frame, 1, np.pi / 180, 100, minLineLength=50, maxLineGap=10)
+    #print(len(lines))
 
     if lines is not None:
         if (wSide == "Left"):
@@ -49,12 +55,13 @@ while True:
         break
 
     gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    BandW_frame = cv2.threshold(gray_frame, 150, 200, cv2.THRESH_BINARY)
     # Split the frame in half
     height, width = frame.shape[:2]
     width_cutoff = width // 2
     black_frame = np.zeros((height, width, 3), dtype=np.uint8)
-    left_frame = frame[:, :10+width_cutoff]
     right_frame = frame[:, width_cutoff-10:]
+    left_frame = frame[:, :10+width_cutoff]
     
     #Each direction "arrow"
     cv2.line(left_frame, (crossL, 480), (crossL, 180), (0, 0, 255), 5)
@@ -64,7 +71,6 @@ while True:
     # Calls the process_frame function twice to create the lines
     processed_right_frame = process_frame(right_frame, gray_frame[:, width_cutoff-10:], "Right")
     processed_left_frame = process_frame(left_frame, gray_frame[:, :10+width_cutoff], "Left")
-    
     
     # Show each half in its corresponding window
     cv2.imshow("Left Camera", processed_left_frame)
