@@ -23,18 +23,18 @@ cv2.namedWindow("Right Camera", cv2.WINDOW_NORMAL)
 
 '''
 
-thresh = None
-BandW_frame = None
+#thresh = None
+#BandW_frame = None
 
 
 
 def process_frame(thisFrame, gray_frame, wSide):
-    global thresh, BandW_frame
+    #global thresh, BandW_frame
     blurred_frame = cv2.GaussianBlur(gray_frame, (5,5), 0)
     _, thresholded_frame = cv2.threshold(blurred_frame, 200, 255, cv2.THRESH_BINARY)
     lines = cv2.HoughLinesP(thresholded_frame, 1, np.pi / 180, 100, minLineLength=50, maxLineGap=10)
     #print(len(lines))
-    thresh, BandW_frame = cv2.threshold(gray_frame, 127, 255, cv2.THRESH_BINARY)    #150, 200
+    #thresh, BandW_frame = cv2.threshold(gray_frame, 127, 255, cv2.THRESH_BINARY)    #150, 200
 
     if lines is not None:
         if (wSide == "Left"):
@@ -92,7 +92,7 @@ while True:
     # Show each half in its corresponding window
     cv2.imshow("Left Camera", processed_left_frame)
     cv2.imshow("Right Camera", processed_right_frame)
-    cv2.imshow("BW", BandW_frame)
+    #cv2.imshow("BW", BandW_frame)
     # Exit on Q key press
     if cv2.waitKey(10) & 0xFF == ord('q'):
         break
@@ -100,6 +100,7 @@ while True:
 # Release the camera and destroy the windows
 cap.release()
 cv2.destroyAllWindows()
+
 
 '''
 #finds average light level
