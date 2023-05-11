@@ -17,3 +17,53 @@ pip install --upgrade pip setuptools wheel
 ISSUE WITH cv2:
 sudo apt-get install python-opencv
 pip install -U numpy
+
+
+
+OTHER STUFF:
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+  -D = CMAKE_INSTALL_PREFIX=/usr/local \
+  -D = OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
+  -D = ENABLE_NEON=ON \
+  -D = ENABLE_VFPV3=ON \
+  -D = BUILD_TESTS=OFF \
+  -D = INSTALL_PYTHON_EXAMPLES=OFF \
+  -D = OPENCV_ENABLE_NONFREE=ON \
+  -D = CMAKE_SHARED_LINKER_FLAGS=-latomic \
+  -D = OPENCV_PYTHON_INSTALL_PATH=lib/python3.9/dist-packages \
+  -D = BUILD_EXAMPLES=OFF ..
+  
+  THEN:
+  make -j$(nproc)
+  
+  (If cpu gets locked up):
+  make
+  
+  INSTALL OPENCV:
+  sudo make install
+  
+  THEN:
+  sudo ldconfig
+  
+  1:
+  sudo nano /etc/dphys-swapfile
+  
+  2:
+  CONF_SWAPSIZE=2048
+  replace with:
+  CONF_SWAPSIZE=100
+  
+  3:
+  sudo systemctl restart dphys-swapfile
+  
+  TESTING OPENCV ON PI:
+  1:
+  python3
+  
+  2:
+  import cv2
+  3:
+  cv2.__version__
+  !Should print --> '4.6.0'
+  
+  
