@@ -4,11 +4,12 @@ import math
 import time
 print("Hello World!")
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # The line(s) for the other lines to pass over
-crossL = 280
-crossR = 360
+crossL = 220
+crossR = 420
+#the middle is 320 
 
 # Sets the resolution of the camera cap
 cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -66,13 +67,18 @@ while True:
     height, width = frame.shape[:2]
     width_cutoff = width // 2
     #black_frame = np.zeros((height, width, 3), dtype=np.uint8)
-    right_frame = frame[:, width_cutoff-10:]
-    left_frame = frame[:, :10+width_cutoff]
-    
+    right_frame = frame[:, width_cutoff+20:]
+    left_frame = frame[:, :width_cutoff-20]
+
+    '''
+    Origionally the code shows more of the camera in each window
+    The right side will show -10 of left and left with show +10 of right
+    '''
+
     #Each direction "arrow"
     cv2.line(left_frame, (crossL, 480), (crossL, 180), (0, 0, 255), 5)
     # Adjust for the different frame
-    cv2.line(right_frame, (crossR - (width_cutoff - 10), 480), (crossR  - (width_cutoff - 10), 180), (0, 0, 255), 5)
+    cv2.line(right_frame, (crossR - (width_cutoff + 20), 480), (crossR  - (width_cutoff + 20), 180), (0, 0, 255), 5)
     
 
     # Apply the mask
@@ -100,6 +106,9 @@ while True:
 # Release the camera and destroy the windows
 cap.release()
 cv2.destroyAllWindows()
+
+
+
 
 
 '''
